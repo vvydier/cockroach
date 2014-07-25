@@ -18,12 +18,14 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/cockroachdb/cockroach/gossip"
 	"github.com/cockroachdb/cockroach/kv"
 )
 
@@ -46,22 +48,28 @@ type actionHandler interface {
 // A adminServer provides a RESTful HTTP API to administration of
 // the cockroach cluster.
 type adminServer struct {
-	kvDB kv.DB // Key-value database client
-	zone *zoneHandler
+	// TODO(shawn) should adminServer either just contain a *server?
+	// Do we even need adminServer?
+
+	gossip *gossip.Gossip
+	kvDB   kv.DB // Key-value database client
+	zone   *zoneHandler
 }
 
 // newAdminServer allocates and returns a new REST server for
 // administrative APIs.
-func newAdminServer(kvDB kv.DB) *adminServer {
+func newAdminServer(gossip *gossip.Gossip, kvDB kv.DB) *adminServer {
 	return &adminServer{
-		kvDB: kvDB,
-		zone: &zoneHandler{kvDB: kvDB},
+		gossip: gossip,
+		kvDB:   kvDB,
+		zone:   &zoneHandler{kvDB: kvDB},
 	}
 }
 
 // handleHealthz responds to health requests from monitoring services.
 func (s *adminServer) handleHealthz(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
+	// TODO actual health monitoring. Node health vs cluster health?
 	fmt.Fprintln(w, "ok")
 }
 
@@ -77,6 +85,26 @@ func (s *adminServer) handleZoneAction(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 	}
+}
+
+// handleDashboardAction serves a admin dashboard rich-client.
+func (s *adminServer) handleDashboardAction(w http.ResponseWriter, r *http.Request) {
+	// TODO(shawn) serve out static assets to render a rich client dashboard (probably d3 to start)
+	// Leverages the stats endpoint to pul cluster and node stats.
+}
+
+// handleStatsAction handles read-only requests for cluster stats.
+func (s *adminServer) handleStatsAction(w http.ResponseWriter, r *http.Request) {
+	// Questions
+	// - validating content type (this only returns json for now)
+	// - expose more of a raw restful interface on various parts of the system?
+	//		- what about pagination
+	//		- historical timeseries etc.
+
+	// Only write out info about the current state of the gossip network for now.
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Println(json.Marshal(s.gossip))
 }
 
 func unescapePath(path, prefix string) (string, error) {

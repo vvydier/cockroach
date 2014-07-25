@@ -107,7 +107,7 @@ type server struct {
 	mux            *http.ServeMux
 	rpc            *rpc.Server
 	gossip         *gossip.Gossip
-	kvDB           kv.DB
+	kvDB           kv.DB // TODO(shawn) pointer?
 	kvREST         *kv.RESTServer
 	node           *Node
 	admin          *adminServer
@@ -294,7 +294,10 @@ func (s *server) start(engines []storage.Engine, selfBootstrap bool) error {
 }
 
 func (s *server) initHTTP() {
+	// TODO(shawn) pretty "/" landing page
 	s.mux.HandleFunc(adminKeyPrefix+"healthz", s.admin.handleHealthz)
+	s.mux.HandleFunc(adminKeyPrefix+"stats", s.admin.handleStats)
+	s.mux.HandleFunc(adminKeyPrefix+"dashboard", s.admin.handleDashboard)
 	s.mux.HandleFunc(zoneKeyPrefix, s.admin.handleZoneAction)
 	s.mux.HandleFunc(kv.KVKeyPrefix, s.kvREST.HandleAction)
 	s.mux.HandleFunc(structured.StructuredKeyPrefix, s.structuredREST.HandleAction)

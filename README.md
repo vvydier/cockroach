@@ -1,4 +1,4 @@
-# Cockroach [![Build Status](https://secure.travis-ci.org/cockroachdb/cockroach.png)](http://travis-ci.org/cockroachdb/cockroach)  [![GoDoc](https://godoc.org/github.com/cockroachdb/cockroach?status.png)](https://godoc.org/github.com/cockroachdb/cockroach) ![Project Status](http://img.shields.io/badge/status-alpha-red.svg) 
+# Cockroach [![Build Status](https://secure.travis-ci.org/cockroachdb/cockroach.png)](http://travis-ci.org/cockroachdb/cockroach)  [![GoDoc](https://godoc.org/github.com/cockroachdb/cockroach?status.png)](https://godoc.org/github.com/cockroachdb/cockroach) ![Project Status](http://img.shields.io/badge/status-alpha-red.svg)
 
 A Scalable, Geo-Replicated, Transactional Datastore
 
@@ -14,7 +14,7 @@ A Scalable, Geo-Replicated, Transactional Datastore
 ## Simple Setup
 
 * node1> ./cockroach init hdd=\<path>
-* node1> ./cockroach start -gossip=:8081 -rpc_addr=:8081 -http_adr=:8080 -stores=hdd=\<path>
+* node1> ./cockroach start -gossip=:8081 -rpc_addr=:8081 -http_addr=:8080 -stores=hdd=\<path>
 
 * node2> ./cockroach start -gossip=node1:8081 -http_adr=:8080 -stores=hdd=\<path>
 
