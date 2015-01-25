@@ -407,4 +407,6 @@ var (
 	// KeyStoreIDGeneratorPrefix specifies key prefixes for sequence
 	// generators, one per node, for store IDs.
 	KeyStoreIDGeneratorPrefix = MakeKey(KeySystemPrefix, proto.Key("store-idgen-"))
+	// KeyRangeTreeRoot specifies the root range in the range tree.
+	KeyRangeTreeRoot = MakeKey(KeySystemPrefix, proto.Key("range-tree-root"))
 )
