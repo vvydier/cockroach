@@ -48,6 +48,14 @@ ifeq ($(STATIC),1)
 GOFLAGS  += -a -tags netgo -ldflags '-extldflags "-lm -lstdc++ -static"'
 endif
 
+ifeq ($(RELEASE),1)
+GOLDFLAGS := -X github.com/cockroachdb/cockroach/util.buildSHA $(shell git rev-parse HEAD)
+GOLDFLAGS += -X github.com/cockroachdb/cockroach/util.buildTag $(shell git describe)
+GOLDFLAGS += -X github.com/cockroachdb/cockroach/util.buildTime $(shell date +%s)
+GOLDFLAGS += -X github.com/cockroachdb/cockroach/util.buildUser ${USER}
+GOFLAGS  += -ldflags '$(GOLDFLAGS)'
+endif
+
 all: build test
 
 auxiliary: storage/engine/cgo_flags.go
@@ -56,6 +64,7 @@ auxiliary: storage/engine/cgo_flags.go
 # have a different root directory than the package being built, hence
 # the need for a separate build invocation for etcd/raft.
 build: auxiliary
+	@echo $(GOLDFLAGS)
 	$(GO) build $(GOFLAGS) -v -i github.com/coreos/etcd/raft
 	$(GO) build $(GOFLAGS) -v -i -o cockroach
 
